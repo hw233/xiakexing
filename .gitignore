@@ -1,0 +1,6 @@
+bin-debug/
+bin-release/
+node_modules/
+~$*
+# assets/js/
+# lib/

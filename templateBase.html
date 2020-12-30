@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,minimum-scale=1,maximum-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="full-screen" content="yes">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="360-fullscreen" content="true">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta name="x5-page-mode" content="app">
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            font: 700/1.5 "微软雅黑", serif;
+            background-color: #282C34;
+            overflow-y: hidden;
+        }
+
+        .center {
+            position: absolute;
+            transform-origin: 0% 0% 0px;
+            transform: translate(-50%, -50%);
+            left: 50%;
+        }
+
+        a {
+            color: #ABB2BF;
+            font-size: 14px;
+            top: 5px;
+            text-decoration: none;
+            border-bottom: 1px dashed #8AB95B;
+            font-family: "微软雅黑";
+        }
+
+        a:hover {
+            color: #57AFEF;
+        }
+
+        /* @font-face {
+            font-family: selfFont;
+            src: url('../../res/font/font.ttf');
+        } */
+    </style>
+
+    <script type="text/javascript" src="../assets/js/melonment.js"></script>
+    <script type="text/javascript" src="../assets/js/engine.js"></script>
+    <script type="text/javascript" src="../assets/js/stage3d.js"></script>
+    <script type="text/javascript" src="../assets/js/component.js"></script>
+    <script type="text/javascript" src="../assets/js/zlib.js"></script>
+    <!--auto-->
+    <!--autoend-->
+
+
+    <script>
+
+        /*config-start*/
+
+        var res_root = "../../res/";
+        var asset_root = "../assets/"
+        var conf_root = "../../conf/zhcn/trunk/";
+
+        /*config-end*/
+
+        var queryStrings = function () {//get url querystring
+            var params = document.location.search, reg = /(?:^\?|&)(.*?)=(.*?)(?=&|$)/g, temp, args = {};
+            while ((temp = reg.exec(params)) != null) args[temp[1]] = decodeURIComponent(temp[2]);
+            return args;
+        };
+
+        var servers = [
+            { id: "137", label: "内网", ip: "192.168.103.137" },
+            { id: "whh", label: "whh", ip: "10.246.121.117" },
+            { id: "xjj", label: "xjj", ip: "10.246.120.192" },
+            { id: "cjy", label: "cjy", ip: "10.246.121.68" },
+            { id: "wf", label: "wf", ip: "10.246.121.150" },
+            { id: "sbw", label: "sbw", ip: "10.246.120.110" },
+        ]
+
+        function setup() {
+
+            rf.cookie_init();
+            let c = rf.cookie["config"];
+
+            let config = {
+                ip: "192.168.103.137",
+                account: "",
+                token: `{"site":"iphone"}`
+            }
+
+            if (c) {
+                config = c;
+            } else {
+                rf.cookie["config"] = config;
+            }
+
+            let div = document.getElementById("logindiv");
+
+            let accountText = document.getElementById("account");
+            accountText.value = config.account;
+            let tokenText = document.getElementById("token");
+            tokenText.value = config.token;
+            let ipText = document.getElementById("ip");
+            ipText.value = config.ip;
+
+            let serverdiv = document.getElementById("serverdiv");
+
+            let str = ``
+
+            for (let i = 0; i < servers.length; i++) {
+                const { ip, label, id } = servers[i];
+                str += `<font color='#FFDD00'>${label}:</font> <input type="radio" name="server" id="${id}" onchange="onSelect(this)" value="${ip}" />    `
+            }
+
+            serverdiv.innerHTML = str;
+
+            // let format = rf.defalue_format;
+            // format.family = "selfFont";
+            // format.init();
+            // format.test("a", undefined, 1);
+
+            // var m = new rf.StageDebug();
+            // setTimeout(() => {
+            //     m.init(document.getElementById("game"));
+            // }, 300);
+        }
+
+        function onSelect(e) {
+            let ipText = document.getElementById("ip");
+            ipText.value = e.defaultValue
+        }
+
+
+        function login() {
+            var launchData = {
+                resroot: res_root,
+                confroot: conf_root,
+                assetsroot: asset_root,
+                domain: document.domain,
+                canvas: document.getElementById("game"),
+                params: queryStrings(),
+                appId: "fishing",
+                ip: "10.246.121.117",
+                port: 8888,
+                // wsurl: "wss://cakeh5.jijiagames.com/h5?host={0}&port={1}"
+                wsurl: "ws://{0}:{1}"
+                // wsurl: "ws://192.168.103.137/h5?host={0}&port={1}"
+            }
+
+            // new rf.Main().init(document.getElementById("game"));
+
+            // rf.launchGame(launchData);
+
+            // rf.singleton(rf.AppLaunch).start(launchData);
+
+            let c = rf.cookie["config"];
+            let div = document.getElementById("logindiv");
+            let accountText = document.getElementById("account");
+            c.account = accountText.value;
+            let tokenText = document.getElementById("token");
+            c.token = tokenText.value;
+            let ipText = document.getElementById("ip");
+            c.ip = ipText.value;
+
+            launchData.account = c.account;
+            launchData.token = c.token;
+            launchData.ip = c.ip
+
+            rf.cookie_flush();
+            div.remove();
+
+            setTimeout(() => {
+                rf.launchGame(launchData);
+            }, 300);
+        }
+
+    </script>
+
+
+</head>
+
+<body onload="setup()">
+    <canvas id="game" style="width: 100%;height: 100%;"></canvas>
+    <!-- <div style="font-family:selfFont;width: 0;height: 0;">t</div> -->
+     <div id="logindiv" style="position: absolute;width: 100%;height: 100%;top: 10px">
+
+
+        <div style="position: absolute;width: 200px;height: 50px;top: 10px ; left: 20px;">
+            <font color='#FFDD00'>账号:</font><input style="position:absolute;height: 20px ;left: 100px;width: 200px;"
+                id="account" type="text" placeholder="请输入用户名" value=""></input>
+        </div>
+
+        <div style="position: absolute;width: 200px;height: 50px;top: 50px ; left: 20px;">
+            <font color='#FFDD00'>token:</font> <textarea
+                style="position:absolute;height: 50px;width: 200px;left: 100px;" id="token" type="text"></textarea>
+        </div>
+
+
+        <div style="position: absolute;width: 400px;height: 50px;top: 110px ; left: 20px;" id="servers">
+            <div style="position: absolute;width: 400px;height: 50px;top: -5px ; left: 100px;" id="serverdiv">
+                <font color='#FFDD00'>内网:</font> <input type="radio" name="server" checked id="neiwang"
+                    onchange="onSelect(this)" />
+                <font color='#FFDD00'>竞杰:</font> <input type="radio" name="server" id="jingjie"
+                    onchange="onSelect(this)" />
+            </div>
+            <br />
+            <font color='#FFDD00'>IP:</font><input style="position:absolute;height: 20px ;left: 100px;width: 200px;"
+                id="ip" type="text"></input>
+        </div>
+
+        <button id="denglu" type="button" onclick="login()"
+            style="position:absolute;height: 50px;width: 200px;left: 120px;top: 160px ; ">登录</button>
+    </div> 
+
+    <div id="container2d"
+        style="position:fixed;pointer-events:none; top: 0px;left:0px;transform-origin: 0% 0% 0px;width: 640px;height: 1080px;">
+        <input id="txt_input" type="text"
+            style="visibility: hidden; position:absolute;resize:none;background: rgba(0, 0, 0, 0);border: 0px"></input>
+    </div>
+
+</body>
+
+</html>
